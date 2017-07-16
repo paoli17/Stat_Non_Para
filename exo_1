@@ -1,0 +1,18 @@
+getwd()
+setwd("E:/Google Drive/TP Béhanzin Paoli_ISE3_2017/script")
+
+#Definition des packages utilisés
+library(locfit)  
+library(KernSmooth) 
+library(mgcv)
+library(splines)
+library(MASS)
+library(mgcv) 
+library(rgl)
+library(boot) 
+library(tidyverse)
+
+# Importation des données et prévisualisation --------------------------------
+
+
+
