@@ -9,35 +9,121 @@ library(boot)
 
 # Question 1: Représentations graphiques ----------------------------------
 
-## Définition des variables x et y (seed afin de reproduire les mêmes valeurs)
-set.seed(1)
-x <- runif(100, min=-3, max=3)
-x <- sort(x)
-erreur <- rnorm(100, mean = 0, sd = 1)
-y <- x^2+erreur
+  ## Définition des variables x et y (seed afin de reproduire les mêmes valeurs)
+  set.seed(1)
+  x <- runif(100, min=-3, max=3)
+  x <- sort(x)
+  erreur <- rnorm(100, mean = 0, sd = 1)
+  y <- x^2+erreur
 
-##Nuage de points
-plot(x, y, col = "blue1", main ="Nuages de points de X et Y")
-lines(x,x^2, lwd=2, col="forestgreen")
+  ##Nuage de points
+  plot(x, y, col = "blue1", main ="Nuages de points de X et Y")
+  lines(x,x^2, lwd=2, col="forestgreen")
 
-##Histogramme et densité
-hist(x, freq = FALSE, col="azure", main = "Histogramme et densité de X")
-lines(density(x, width = 4), lwd = 2, col = "blue1")
-hist(y, freq = FALSE, col="azure3", main = "Histogramme et densité de Y")
-lines(density(x, width = 6), lwd = 2, col = "blue1")
+  ##Histogramme et densité
+  hist(x, freq = FALSE, col="azure", main = "Histogramme et densité de X")
+  lines(density(x, width = 4), lwd = 2, col = "blue1")
+  hist(y, freq = FALSE, col="azure3", main = "Histogramme et densité de Y")
+  lines(density(x, width = 6), lwd = 2, col = "blue1")
 
 
 
 # Tests paramétriques et non param de dépendance --------------------------
 
 
-## Tests paramétriques d'indépendance
+  ## Tests paramétriques d'indépendance
 
-cor.test(x, y, method = "pearson")
-cor.test(x^2, y, method = "pearson")
+  cor.test(x, y, method = "pearson")
+  cor.test(x^2, y, method = "pearson")
 
-## Testsnon param
+  ## Testsnon param
 
-### test de spearman 
-cor.test(x, y, method = "spearman")
-cor.test(x^2, y, method = "spearman")
+    ### test de spearman 
+    cor.test(x, y, method = "spearman")
+    cor.test(x^2, y, method = "spearman")
+
+# Question : Régressions --------------------------------------------------
+
+  ## Regression polynomiale sur les linéaires et quadra
+
+  X1 <- x
+  X2 <- x^2
+  reg <- lm(y ~ X1+X2)
+  summary(reg)
+  plot(x, y, col = "blue1")
+  lines(x,fitted(reg), col="red")
+  
+    ### Testons les résidus
+    plot(reg$residuals, col="blue",lwd=3, type="l")
+    hist(reg$residuals, freq = FALSE, col="azure", main = "Histogramme des résidus")
+    lines(density(reg$residuals, width = 1.5), col = "red")
+    ks.test(reg$residuals, pnorm)
+    shapiro.test(reg$residuals)
+
+    ###Définition de fonction R au carré pour les données
+        #### La fonction est nommée rsq
+        rsq <- function(formula, data, indices) {
+            d <- data[indices,] # allows boot to select sample
+            fit <- lm(formula, data=d)
+            return(summary(fit)$r.square)
+        }
+  x1 <- as.numeric(X1) 
+  x2 <- as.numeric(X2)
+  y <- as.numeric(y)
+  donnee <- data.frame(cbind(y,x1,x2))
+  
+  ## bootstrapping avec 100 replications
+  boot_poly <- boot(donnee, statistic=rsq, sim ="ordinary" , R=100, formula=y~x1+x2)
+  
+  ## view results
+  summary(boot_poly)
+  summary(boot_poly$t)
+  
+  ## Régression splines par la méthode du choix des noeuds
+
+    noeuds <- quantile(x, probs = seq(0, 1, 0.1), na.rm = FALSE,names = TRUE, type = 7)
+    noeud <- noeuds[2:(length(noeuds)-1)]
+    Xsb <- bs(x,knots = noeud, degree = 2,intercept=TRUE)
+    reg_spline <-  lm(y ~ Xsb-1)
+    summary(reg_spline)
+
+  ## test des residus
+
+    plot(reg_spline$residuals, col="blue",lwd=2, type="l")
+    hist(reg_spline$residuals, freq = FALSE , col = "azure")
+    lines(density(reg_spline$residuals, width = 1.5), lwd = 2, col = "red")
+    ks.test(reg_spline$residuals, pnorm)
+    shapiro.test(reg_spline$residuals)
+
+  ## Régression lineaire locale
+    reg_local <- loess(y ~ x, degree = 1)
+    summary(reg_local)
+    plot(reg_local$residuals, col="blue",lwd=2, type="l")
+    hist(reg_local$residuals, freq = FALSE, col="azure", main = "Histogramme des résidus")
+    lines(density(reg_local$residuals, width = 1.5), lwd = 2, col = "red")
+    
+    ks.test(reg_lin$residuals, pnorm)
+    shapiro.test(reg_lin$residuals)
+
+
+  ## Comparaison des prédictions
+  reg_local_ad <- reg_local$fitted
+  reg_ad <- reg$fitted.values
+  reg_spline_ad <- reg_spline$fitted.values
+  
+  plot(y ~ x, pch=18, col="black", main="Valeurs prédites des trois modèles")
+  lines(x, reg_local_ad, col="blue", lwd=2)
+  lines(x, reg_ad, col="red", lwd=2)
+  lines(x, reg_spline_ad, col="green", lwd=2)
+  legend("topright", legend=c("Locale", "Polynomiale", "Spline"),
+         col=c("blue", "red", "green"), lty=1:2, cex=0.8)
+
+
+  ## CALCUL DE RMSE
+  
+  rmse_1 <- sqrt(mean((y-reg$fitted.values)^2))
+  
+  rmse_2 <- sqrt(mean((y-reg_local$fitted)^2))
+  
+  rmse_3=sqrt(mean((y-reg_spline$fitted.values)^2))
+  
