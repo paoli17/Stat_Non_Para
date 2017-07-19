@@ -25,70 +25,65 @@ summary(noteH)
 noteF <- note[which(note$sexe=="F"),] ##Notes des femmes
 summary(noteF)
 
-##Plots pour la note 1 selon le sexe
-with(noteH,plot(sexe, note1, type = "boxplot", xlab = "Sexe", ylab="Note 1"))
-par(new=TRUE)
-with(noteF,plot(sexe, note1, type = "boxplot", xlab = "Sexe", ylab="Note 1"))
+  ##Plots pour la note 1 selon le sexe
+  with(noteH,plot(sexe, note1, type = "boxplot", xlab = "Sexe", ylab="Note 1"))
+  par(new=TRUE)
+  with(noteF,plot(sexe, note1, type = "boxplot", xlab = "Sexe", ylab="Note 1"))
 
-##Plots boites a moustaches selon le sexe
-
-with(noteH,plot(sexe, note2, type = "boxplot", xlab = "Sexe", ylab="Note 2"))
-par(new=TRUE)
-with(noteF,plot(sexe, note2, type = "boxplot", xlab = "Sexe", ylab="Note 2"))
-
-
-##Densité des notes 1
-with(noteF,plot(density(note1), col="blue",xlab="Note", main = "Densités de la note 1", ylab = "Densité",xlim=c(0,20),ylim = c(0,0.4)))
-par(new=TRUE)
-with(noteH,plot(density(note1), col="red",xlab="Note", main = "Densités de la note 1", ylab = "Densité", xlim=c(0,20) ,ylim = c(0,0.4)))
-legend("topright", legend=c("F", "H"),
-       col=c("blue", "red"), lty=1:2, cex=0.8)
+  ##Plots boites a moustaches selon le sexe
+  
+  with(noteH,plot(sexe, note2, type = "boxplot", xlab = "Sexe", ylab="Note 2"))
+  par(new=TRUE)
+  with(noteF,plot(sexe, note2, type = "boxplot", xlab = "Sexe", ylab="Note 2"))
 
 
-##Densité des notes 2
-with(noteF,plot(density(note2), col="blue",xlab="Note", main = "Densités de la note 2", ylab = "Densité",xlim=c(0,20) ,ylim = c(0,0.25)))
-par(new=TRUE)
-with(noteH,plot(density(note2), col="red",xlab="Note", main = "Densités de la note 2", ylab = "Densité",xlim=c(0,20),ylim = c(0,0.25)))
-legend("topright", legend=c("F", "H"),
-       col=c("blue", "red"), lty=1:2, cex=0.8)
+  ##Densité des notes 1
+  with(noteF,plot(density(note1), col="blue",xlab="Note", main = "Densités de la note 1", ylab = "Densité",xlim=c(0,20),ylim = c(0,0.4)))
+  par(new=TRUE)
+  with(noteH,plot(density(note1), col="red",xlab="Note", main = "Densités de la note 1", ylab = "Densité", xlim=c(0,20) ,ylim = c(0,0.4)))
+  legend("topright", legend=c("F", "H"),
+         col=c("blue", "red"), lty=1:2, cex=0.8)
+  
+  ##Densité des notes 2
+  with(noteF,plot(density(note2), col="blue",xlab="Note", main = "Densités de la note 2", ylab = "Densité",xlim=c(0,20) ,ylim = c(0,0.25)))
+  par(new=TRUE)
+  with(noteH,plot(density(note2), col="red",xlab="Note", main = "Densités de la note 2", ylab = "Densité",xlim=c(0,20),ylim = c(0,0.25)))
+  legend("topright", legend=c("F", "H"),
+         col=c("blue", "red"), lty=1:2, cex=0.8)
 
 # Question 1 --------------------------------------------------------------
 
-#H0: Mêmes paramètres de position
-wilcox.test(noteH$note1,noteF$note1, alternative = "two.sided", exact = F)#test de paramètre de position
-wilcox.test(noteH$note2,noteF$note2, alternative = "two.sided", exact=F)
+  ##H0: Mêmes paramètres de position
+  wilcox.test(noteH$note1,noteF$note1, alternative = "two.sided", exact = F)#test de paramètre de position
+  wilcox.test(noteH$note2,noteF$note2, alternative = "two.sided", exact=F)
 
-#Test d'égalité des paramètres d'échelle
-#H0: Mêmes paramètres d'échelle.
-mood.test(noteH$note1,noteF$note1, alternative="two.sided", exact = F)
-mood.test(noteH$note2,noteF$note2, alternative="two.sided", exact = F)
+  ##Test d'égalité des paramètres d'échelle
+  #H0: Mêmes paramètres d'échelle.
+  mood.test(noteH$note1,noteF$note1, alternative="two.sided", exact = F)
+  mood.test(noteH$note2,noteF$note2, alternative="two.sided", exact = F)
 
-#Test de komlogorov-smirnov
-ks.test(noteH$note1,noteF$note1, alternative="two.sided")
-ks.test(noteH$note2,noteF$note2, alternative="two.sided")
-
-
+  ##Test de komlogorov-smirnov
+  ks.test(noteH$note1,noteF$note1, alternative="two.sided")
+  ks.test(noteH$note2,noteF$note2, alternative="two.sided")
 
 
 # Question 2 --------------------------------------------------------------
 
+  note.2 <-subset(note, select=note2)[,1]
 
-note.2 <-subset(note, select=note2)[,1]
-
-#Test de signe.
-binom.test(sum(note.2-10>0), length(note.2), p=0.5, alternative="greater")
-
+  ##Test de signe.
+  binom.test(sum(note.2-10>0), length(note.2), p=0.5, alternative="greater")
 
 # Question 3 --------------------------------------------------------------
 
 
-##Plots boites a moustaches selon le sexe
-note.1 <- note[,2]
-plot(note$sexe,note.2, type = "boxplot", col="dodgerblue",xlab = "Elèves", ylab="Note 2")
-plot(note$sexe, note.1, type = "boxplot", col="aliceblue",xlab = "Elèves", ylab="Note 1")
+  ##Plots boites a moustaches selon le sexe
+  note.1 <- note[,2]
+  plot(note$sexe,note.2, type = "boxplot", col="dodgerblue",xlab = "Elèves", ylab="Note 2")
+  plot(note$sexe, note.1, type = "boxplot", col="aliceblue",xlab = "Elèves", ylab="Note 1")
 
-#Test de wilcoxon sur les deux matières
-wilcox.test(note[,2], note[,3], alternative="two.sided", exact=F)
+  ##Test de wilcoxon sur les deux matières
+  wilcox.test(note[,2], note[,3], alternative="two.sided", exact=F)
 
 
 # Question 4 --------------------------------------------------------------
@@ -96,8 +91,7 @@ wilcox.test(note[,2], note[,3], alternative="two.sided", exact=F)
 mesnotes <- data.frame(rangnote1=rank(note[,2]), rangnote2=rank(note[,3]))
 ggplot(mesnotes, aes(x=rangnote1, y=rangnote2))+geom_point()+xlab("Rangs de la note 1")+ylab("Rangs de la note 2")
 
-  #Test de kendall
+  ##Test de kendall
   with(mesnotes,cor.test(rangnote1, rangnote2, method="kendall",exact=F))
-  #Test de spearman
+  ##Test de spearman
   with(mesnotes,cor.test(rangnote1, rangnote2, method="spearman",exact=F))
-
