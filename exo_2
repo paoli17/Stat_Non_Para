@@ -1,0 +1,43 @@
+library(locfit) 
+library(KernSmooth) 
+library(splines)
+library(MASS)
+library(mgcv) 
+library(rgl)
+library(boot) 
+
+
+# Question 1: Représentations graphiques ----------------------------------
+
+## Définition des variables x et y (seed afin de reproduire les mêmes valeurs)
+set.seed(1)
+x <- runif(100, min=-3, max=3)
+x <- sort(x)
+erreur <- rnorm(100, mean = 0, sd = 1)
+y <- x^2+erreur
+
+##Nuage de points
+plot(x, y, col = "blue1", main ="Nuages de points de X et Y")
+lines(x,x^2, lwd=2, col="forestgreen")
+
+##Histogramme et densité
+hist(x, freq = FALSE, col="azure", main = "Histogramme et densité de X")
+lines(density(x, width = 4), lwd = 2, col = "blue1")
+hist(y, freq = FALSE, col="azure3", main = "Histogramme et densité de Y")
+lines(density(x, width = 6), lwd = 2, col = "blue1")
+
+
+
+# Tests paramétriques et non param de dépendance --------------------------
+
+
+## Tests paramétriques d'indépendance
+
+cor.test(x, y, method = "pearson")
+cor.test(x^2, y, method = "pearson")
+
+## Testsnon param
+
+### test de spearman 
+cor.test(x, y, method = "spearman")
+cor.test(x^2, y, method = "spearman")
